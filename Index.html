@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Патроны к пистолету Макарова</title>
+    <!-- Подключение Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Пользовательские стили для шрифта Inter */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Легкий серый фон */
+            color: #334155; /* Темно-серый текст */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        /* Стили для кнопок-патронов */
+        .cartridge-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .cartridge-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .cartridge-button.selected {
+            background-color: #3b82f6; /* Синий при выборе */
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+        }
+        /* Стили для карточки с деталями */
+        .details-card {
+            background-color: white;
+            border-radius: 0.75rem; /* Закругленные углы */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Тень */
+            padding: 1.5rem;
+            max-width: 90%;
+            width: 100%;
+        }
+        @media (min-width: 768px) {
+            .details-card {
+                max-width: 600px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="container mx-auto p-4 md:p-8 bg-white rounded-xl shadow-lg flex flex-col lg:flex-row gap-8">
+        <!-- Левая панель: Список патронов -->
+        <div class="w-full lg:w-1/3 p-4 bg-gray-50 rounded-lg shadow-inner">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-700">Виды патронов 9х18</h2>
+            <div id="cartridge-list" class="flex flex-col space-y-3">
+                <!-- Кнопки патронов будут сгенерированы JS -->
+            </div>
+        </div>
+
+        <!-- Правая панель: Детали выбранного патрона -->
+        <div class="w-full lg:w-2/3 p-4 bg-white rounded-lg shadow-md flex flex-col items-center justify-start">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-700" id="details-title">Выберите патрон</h2>
+            <div id="cartridge-image" class="w-48 h-48 mb-6 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden shadow-inner">
+                <img src="https://placehold.co/192x192/CBD5E1/475569?text=9mm+Patron" alt="Изображение патрона" class="w-full h-full object-cover">
+            </div>
+            <div id="cartridge-details" class="text-gray-600 text-lg w-full">
+                <!-- Детали патрона будут сгенерированы JS -->
+                <p class="text-center text-gray-500 italic">Нажмите на патрон слева, чтобы узнать подробности.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Данные о патронах, извлеченные из документа
+        const cartridges = [
+            {
+                name: "9 Пст (57-Н-181С)",
+                type: "с пулей со стальным сердечником",
+                purpose: "Предназначен для поражения живых целей на дальности до 50 м.",
+                massCartridge: "10 г",
+                massBullet: "6 г",
+                lengthCartridge: "25 мм",
+                initialVelocity: "298 м/с",
+                accuracy: "3.2 см (R50 на 25 м)"
+            },
+            {
+                name: "РГ 028",
+                type: "с пулей повышенной пробивной способности",
+                purpose: "Предназначен для поражения живых целей в средствах индивидуальной броне защиты.",
+                massCartridge: "11 г",
+                massBullet: "6 г",
+                lengthCartridge: "25 мм",
+                initialVelocity: "325 м/с",
+                accuracy: "3.2 см (R50 на 25 м)"
+            },
+            {
+                name: "9 ПП (7Н16)",
+                type: "с пулей повышенной пробиваемости",
+                purpose: "Предназначен для поражения живых целей на дальности до 50 м. Повышение пробивного и останавливающего действия.",
+                massCartridge: "9.6 г",
+                massBullet: "5.5 г",
+                lengthCartridge: "25 мм",
+                initialVelocity: "420 м/с",
+                accuracy: "Н/Д" // Not available in the provided text
+            },
+            {
+                name: "СП7",
+                type: "с пулей повышенного останавливающего действия",
+                purpose: "Предназначен для поражения живых целей, незащищенных средствами бронезащиты. Повышенное останавливающее действие.",
+                massCartridge: "8 г",
+                massBullet: "6 г",
+                lengthCartridge: "25 мм",
+                initialVelocity: "420 м/с",
+                accuracy: "Н/Д"
+            },
+            {
+                name: "СП8",
+                type: "с пулей малой пробивной способности",
+                purpose: "Предназначен для поражения живых целей в условиях применения оружия в воздушном транспорте специальными подразделениями правоохранительных органов.",
+                massCartridge: "Н/Д", // Not available in the provided text
+                massBullet: "5 г",
+                lengthCartridge: "25 мм",
+                initialVelocity: "250 м/s",
+                accuracy: "3.2 см (R50 на 25 м)"
+            },
+            {
+                name: "ПБМ (7Н25)",
+                type: "с бронебойной пулей",
+                purpose: "Предназначен для поражения живых целей в средствах индивидуальной броне защиты на дальности до 50 м.",
+                massCartridge: "7.4 г",
+                massBullet: "3.55 г",
+                lengthCartridge: "25 мм",
+                initialVelocity: "520 м/с",
+                accuracy: "Н/Д"
+            },
+            {
+                name: "ПЭ",
+                type: "с экспансивной пулей",
+                purpose: "Создан для подразделений МВД. Предназначен для поражения незащищенных живых целей на дальности до 50 м. Пуля экспансивная, полуоболочечная с полостью в головной части.",
+                massCartridge: "Н/Д",
+                massBullet: "Н/Д",
+                lengthCartridge: "Н/Д",
+                initialVelocity: "Н/Д",
+                accuracy: "Н/Д"
+            },
+            {
+                name: "ПТ",
+                type: "с трассирующей пулей",
+                purpose: "Создавался для стрельбы из пистолетов-пулеметов. Предназначен для поражения живых целей, целеуказания и корректирования огня.",
+                massCartridge: "Н/Д",
+                massBullet: "Н/Д",
+                lengthCartridge: "Н/Д",
+                initialVelocity: "Н/Д",
+                accuracy: "Н/Д"
+            },
+            {
+                name: "9 ПРС",
+                type: "с пулей с пониженной рикошетирующей способностью",
+                purpose: "Создан по заказу МВД России. При попадании в твердые преграды такая пуля сминается, быстро теряет скорость и не дает опасных рикошетов.",
+                massCartridge: "Н/Д",
+                massBullet: "Н/Д",
+                lengthCartridge: "Н/Д",
+                initialVelocity: "Н/Д",
+                accuracy: "Н/Д"
+            },
+            {
+                name: "9 уч (57-Н-181 уч)",
+                type: "учебный пистолетный патрон",
+                purpose: "Предназначен для обучения приемам заряжания и разряжения оружия, производства выстрела и снаряжения магазинов. Не содержит порохового заряда и имеет охолощенный капсюль-воспламенитель.",
+                massCartridge: "Н/Д",
+                massBullet: "Н/Д",
+                lengthCartridge: "Н/Д",
+                initialVelocity: "Н/Д",
+                accuracy: "Н/Д"
+            }
+        ];
+
+        const cartridgeList = document.getElementById('cartridge-list');
+        const detailsTitle = document.getElementById('details-title');
+        const cartridgeDetails = document.getElementById('cartridge-details');
+
+        // Функция для отображения деталей патрона
+        function displayCartridgeDetails(cartridge) {
+            detailsTitle.textContent = `${cartridge.name} (${cartridge.type})`;
+            cartridgeDetails.innerHTML = `
+                <p><strong class="font-semibold">Назначение:</strong> ${cartridge.purpose}</p>
+                <p><strong class="font-semibold">Масса патрона:</strong> ${cartridge.massCartridge}</p>
+                <p><strong class="font-semibold">Масса пули:</strong> ${cartridge.massBullet}</p>
+                <p><strong class="font-semibold">Длина патрона:</strong> ${cartridge.lengthCartridge}</p>
+                <p><strong class="font-semibold">Начальная скорость пули:</strong> ${cartridge.initialVelocity}</p>
+                <p><strong class="font-semibold">Кучность стрельбы (на 25 м):</strong> ${cartridge.accuracy}</p>
+            `;
+        }
+
+        // Заполнение списка патронов и добавление обработчиков событий
+        cartridges.forEach((cartridge, index) => {
+            const button = document.createElement('button');
+            button.className = 'cartridge-button bg-blue-100 text-blue-800 py-3 px-5 rounded-md text-lg font-medium hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-200 ease-in-out text-left';
+            button.textContent = `${cartridge.name} (${cartridge.type})`;
+            button.addEventListener('click', () => {
+                // Удаление класса 'selected' со всех кнопок
+                document.querySelectorAll('.cartridge-button').forEach(btn => {
+                    btn.classList.remove('selected', 'bg-blue-700', 'text-white');
+                    btn.classList.add('bg-blue-100', 'text-blue-800', 'hover:bg-blue-200');
+                });
+                // Добавление класса 'selected' к текущей кнопке
+                button.classList.add('selected', 'bg-blue-700', 'text-white');
+                button.classList.remove('bg-blue-100', 'text-blue-800', 'hover:bg-blue-200');
+                displayCartridgeDetails(cartridge);
+            });
+            cartridgeList.appendChild(button);
+        });
+
+        // Отображение деталей первого патрона по умолчанию
+        window.onload = () => {
+            if (cartridges.length > 0) {
+                // Имитация клика на первую кнопку для выбора по умолчанию
+                const firstButton = cartridgeList.querySelector('.cartridge-button');
+                if (firstButton) {
+                    firstButton.click();
+                }
+            }
+        };
+    </script>
+</body>
+</html>
